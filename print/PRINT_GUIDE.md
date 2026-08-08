@@ -1,121 +1,63 @@
 # Elegoo Centauri Carbon 2 — Baskı Kılavuzu
 
-RAF Silah Organizörü, **256 × 256 × 256 mm** yatak için modüler parçalara bölünmüştür. Tüm STL’ler güvenli sınır olan **≤250 mm** içindedir (brim / etek payı).
+> **Bugün basıyorsan:** önce [`BUGUN.md`](BUGUN.md) oku.
+
+Yatak **256 × 256 × 256 mm**. Parçalar brim (5 mm) ile **≤244 mm** olacak şekilde boyutlandırıldı.
 
 ## Dosyalar
 
-| Dosya | Açıklama |
+| Dosya | Kullanım |
 |-------|----------|
-| `print/RAF-silah-organizoru-CC2.3mf` | Tüm parçalar (Elegoo Slicer / Orca / Bambu Studio) |
-| `print/stl/*.stl` | Tek tek STL’ler |
-| `print/manifest.json` | Boyutlar, hacimler, adet listesi |
-| `scripts/generate_print_kit.py` | Yeniden üretmek için script |
+| [`BUGUN.md`](BUGUN.md) | Bugünkü adım adım sıra |
+| [`plates/`](plates/) | Hazır dizilmiş plakalar (önerilen) |
+| [`RAF-CC2-PLATES.3mf`](RAF-CC2-PLATES.3mf) | Tüm plakalar tek 3MF |
+| [`stl/`](stl/) | Tek parçalar |
+| [`RAF-silah-organizoru-CC2.3mf`](RAF-silah-organizoru-CC2.3mf) | Tek parçalar 3MF |
+| [`cc2-settings.json`](cc2-settings.json) | Slicer parametreleri |
+| [`manifest.json`](manifest.json) | Boyut / filament tahmini |
 
-## Malzeme önerisi
+## Slicer
 
-| Parça | Filament | Neden |
-|-------|----------|--------|
-| Panel, yuva, raf, braket | **PETG** veya **PETG-CF** | Darbe / yük dayanımı |
-| Askı şeridi, tabanca askısı | PETG | Fonksiyonel |
-| Keçe pad (`10_tpu_felt_pad`) | **TPU 95A** | Silah yüzeyini korur |
+**ELEGOO Slicer** → makine: **Centauri Carbon 2** → **0.20mm Standard**  
+G-code’u Orca’dan üretme; CC2 `PRINT_START` / `PRINT_END` makroları Elegoo profilinde.
 
-PLA yalnızca prototip için uygundur; uzun namlu yükü için önerilmez. Centauri Carbon 2 hardened nozzle ile CF filament basabilir.
+## Malzeme
 
-## Adet listesi (BOM)
+| Parça | Filament |
+|-------|----------|
+| Panel, yuva, raf, braket, pin | **PETG** veya PETG-CF |
+| `plate_E_tpu_pads` | **TPU 95A** |
 
-| Parça | Adet | Not |
-|-------|------|-----|
-| `01_back_panel` | **3** | Üst üste kırlangıç ile ~720 mm yükseklik |
-| `02_panel_pin` | **8** | Panel hizalama |
-| `03_rifle_cradle` | **4** | Üst namlu yuvası |
-| `04_stock_rest` | **4** | Alt dipçik dayanağı |
-| `05_magazine_rack` | **1** | 4 şarjör bölmesi |
-| `06_pistol_mount` | **2** | |
-| `07_peg_rail` | **1** | 5 kanca |
-| `08_shelf` | **1** | Üst aksesuar rafı |
-| `09_wall_bracket` | **4** | Duvar montajı |
-| `10_tpu_felt_pad` | **8** | Yuva içi (opsiyonel) |
+## Adet (tam kit)
 
-### Donanım
+| Parça | Adet |
+|-------|------|
+| back_panel | 3 (~660 mm yükseklik) |
+| rifle_cradle | 4 |
+| stock_rest | 4 |
+| magazine_rack | 1 |
+| pistol_mount | 2 |
+| peg_rail | 1 |
+| shelf | 1 |
+| wall_bracket | 4 |
+| panel_pin | 8 |
+| tpu_felt_pad | 8 |
 
-- **M3×12** vida ≈ 36 adet (aksesuar → panel)
-- **M3×16** vida ≈ 8 adet (braket → duvar / panel)
-- Duvar dübeli (tuğla/beton) veya ahşap vidası
-- İsteğe bağlı: M3 brass heat-set insert (panel deliklerine)
+Donanım: M3×12 ≈ 36, M3×16 ≈ 8, duvar dübeli.
 
-## Elegoo Slicer ayarları (0.4 mm nozzle)
+## PETG ayar (0.4 mm)
 
-Profile: **Centauri Carbon 2** / **0.20 mm Standard**
+Layer 0.20 · Walls 4 (yuva 5) · Infill %40 gyroid (panel %25) · 245 / 85 °C · Fan %40 · Brim 5 mm · Supports off · Max 180 mm/s
 
-### Yapısal parçalar (PETG)
+## Plaka planı
 
-| Ayar | Değer |
-|------|-------|
-| Layer height | 0.20 mm |
-| First layer | 0.28 mm |
-| Wall loops | **4** (yuva/dayanak için **5**) |
-| Top / bottom shells | 5 / 5 |
-| Infill | **40%** gyroid (panel **25%**) |
-| Nozzle | 240–250 °C (filamente göre) |
-| Bed | 80–90 °C |
-| Fan | %30–50 |
-| Outer wall speed | 80–120 mm/s |
-| Max speed | ≤200 mm/s (kalite için 500’e çıkmayın) |
-| Brim | Panel ve rafta **8 mm brim** |
-| Supports | **Kapalı** (aşağıdaki yönelimlerle) |
+1. `plate_A_panel_x1` ×3  
+2. `plate_B_cradles_full` ×1  
+3. `plate_C_accessories` ×1  
+4. `plate_D_pins` ×1  
+5. `plate_E_tpu_pads` ×1 (TPU)
 
-### TPU pad
-
-| Ayar | Değer |
-|------|-------|
-| Layer | 0.20 mm |
-| Walls | 3 |
-| Infill | 15% |
-| Speed | 30–40 mm/s |
-| Retraction | düşük / filamente göre |
-| Supports | Yok |
-
-## Baskı yönelimi (supportsiz)
-
-1. **back_panel** — düz yüzeyi yatağa; kırlangıç kenarı serbest
-2. **rifle_cradle / stock_rest** — montaj flanşı yatağa (Y delikleri yatay)
-3. **magazine_rack** — taban yatağa
-4. **pistol_mount** — arka plaka yatağa
-5. **peg_rail** — arka yüz yatağa (kancalar yukarı)
-6. **shelf** — raf yüzeyi yatağa
-7. **wall_bracket** — L’nin bir kanadı yatağa
-8. **panel_pin / tpu pad** — düz
-
-> Kancalı parçalarda küçük köprüler olabilir; PETG’de genelde destek gerekmez. Kopma olursa tree support açın.
-
-## Plaka planı (örnek)
-
-Tek seferde sığabilecekler (yaklaşık):
-
-- Plaka A: 1× panel  
-- Plaka B: 4× cradle + 4× stock_rest  
-- Plaka C: mag_rack + 2× pistol + peg_rail + shelf + 4× bracket + pinler  
-
-3 paneli ayrı basmak en güvenlisidir (büyük yüzey, warp riski).
-
-## Montaj sırası
-
-1. 3 paneli kırlangıç + hizalama pimi ile birleştir → dikey sütun (~720 mm).
-2. 4× `wall_bracket` ile duvara sabitle (sağlam dübel).
-3. Üst sıraya 4× `rifle_cradle`, alta 4× `stock_rest` (aynı X hizası, ızgara delikleri).
-4. Sol alt: `magazine_rack`.
-5. Sağ: 2× `pistol_mount`.
-6. Alt orta/sağ: `peg_rail`.
-7. En üst: `shelf`.
-8. TPU pad’leri yuva kanallarına yapıştır (kontakt / CA).
-
-## Güvenlik
-
-- Organizör **boş ağırlık** ve silah ağırlığını taşır; duvar ankrajını abartılı yapın.
-- Namlu / dipçik temas yüzeylerinde mutlaka yumuşak pad kullanın.
-- Yerel silah saklama mevzuatına uyun.
-
-## Yeniden üretme
+## Yeniden üret
 
 ```bash
 pip install trimesh manifold3d numpy

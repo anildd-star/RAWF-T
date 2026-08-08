@@ -1,34 +1,27 @@
 {
   "printer": "Elegoo Centauri Carbon 2",
-  "build_volume_mm": [256, 256, 256],
+  "profile": "0.20mm Standard",
   "nozzle_mm": 0.4,
-  "recommended_profile": "0.20mm Standard @CC2",
-  "petg_structural": {
+  "petg": {
     "layer_height_mm": 0.2,
-    "initial_layer_height_mm": 0.28,
-    "wall_loops": 4,
-    "wall_loops_cradles": 5,
-    "top_shells": 5,
-    "bottom_shells": 5,
-    "infill_percent": 40,
-    "infill_panel_percent": 25,
-    "infill_pattern": "gyroid",
-    "nozzle_temp_c": [240, 250],
-    "bed_temp_c": [80, 90],
-    "fan_percent": [30, 50],
-    "outer_wall_speed_mms": 100,
-    "max_speed_mms": 200,
-    "brim_mm": 8,
-    "supports": false,
-    "notes": "Do not use 500 mm/s for load-bearing parts. Prefer PETG or PETG-CF."
+    "walls": 4,
+    "walls_cradle": 5,
+    "infill": 40,
+    "infill_panel": 25,
+    "pattern": "gyroid",
+    "nozzle_c": 245,
+    "bed_c": 85,
+    "fan": 40,
+    "brim_mm": 5,
+    "max_speed_mms": 180,
+    "supports": false
   },
-  "tpu_pads": {
+  "tpu": {
     "layer_height_mm": 0.2,
-    "wall_loops": 3,
-    "infill_percent": 15,
+    "walls": 3,
+    "infill": 15,
     "speed_mms": 35,
     "supports": false
   },
-  "slicer": "ELEGOO Slicer / Orca Slicer — select Centauri Carbon 2 machine profile",
-  "file": "print/RAF-silah-organizoru-CC2.3mf"
+  "start_gcode_note": "ElegooSlicer CC2 profilindeki PRINT_START / PRINT_END makrolarını kullanın"
 }
