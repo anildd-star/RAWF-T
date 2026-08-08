@@ -1,0 +1,27 @@
+{
+  "printer": "Elegoo Centauri Carbon 2",
+  "profile": "0.20mm Standard",
+  "nozzle_mm": 0.4,
+  "petg": {
+    "layer_height_mm": 0.2,
+    "walls": 4,
+    "walls_cradle": 5,
+    "infill": 40,
+    "infill_panel": 25,
+    "pattern": "gyroid",
+    "nozzle_c": 245,
+    "bed_c": 85,
+    "fan": 40,
+    "brim_mm": 5,
+    "max_speed_mms": 180,
+    "supports": false
+  },
+  "tpu": {
+    "layer_height_mm": 0.2,
+    "walls": 3,
+    "infill": 15,
+    "speed_mms": 35,
+    "supports": false
+  },
+  "start_gcode_note": "ElegooSlicer CC2 profilindeki PRINT_START / PRINT_END makrolarını kullanın"
+}

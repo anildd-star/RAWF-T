@@ -1,22 +1,20 @@
-# RAF — Silah Organizörü (3D)
+# RAF — Silah Organizörü
 
-Duvara monte silah organizörünün etkileşimli Three.js modeli.
+Three.js önizleme + **Elegoo Centauri Carbon 2** baskı kiti.
 
-## Özellikler
+## Bugün baskı
 
-- Meşe arka panel + çelik ray çerçevesi
-- 4 tüfek / uzun namlu yuvası (keçe kaplı)
-- 2 tabanca askısı
-- Şarjör rafı (4 bölmeli)
-- Üst aksesuar rafı ve askı şeridi
-- Orbit kamera, otomatik dönüş, parça odaklama
+1. [`print/BUGUN.md`](print/BUGUN.md) — adım adım  
+2. Plakalar: [`print/plates/`](print/plates/) veya [`print/RAF-CC2-PLATES.3mf`](print/RAF-CC2-PLATES.3mf)  
+3. **ELEGOO Slicer** → Centauri Carbon 2 → PETG → 5 mm brim → slice
 
-## Çalıştırma
+Day-1: 2× panel + `plate_DAY1_minimum` → 2 silah asacak set.
 
-Yerel bir HTTP sunucusu gerekir (ES modules):
+## Tam dokümantasyon
+
+[`print/PRINT_GUIDE.md`](print/PRINT_GUIDE.md)
 
 ```bash
+python3 scripts/generate_print_kit.py
 npx --yes serve .
 ```
-
-Ardından tarayıcıda açılan adrese gidin.
