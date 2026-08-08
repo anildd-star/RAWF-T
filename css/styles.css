@@ -1,0 +1,231 @@
+@font-face {
+  font-family: "Syne";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("https://fonts.gstatic.com/s/syne/v22/8vIS7w4qim65kbX9dXMF.woff2") format("woff2");
+}
+
+:root {
+  --ink: #1a1510;
+  --steel: #2c2a28;
+  --oak: #8b5a2b;
+  --brass: #c4a35a;
+  --fog: #d8d0c4;
+  --mist: #f0ebe3;
+  --accent: #a63d1b;
+  --panel: rgba(26, 21, 16, 0.72);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+  color: var(--mist);
+  background: var(--ink);
+}
+
+body {
+  background:
+    radial-gradient(ellipse 90% 70% at 70% 40%, rgba(139, 90, 43, 0.28), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 15% 85%, rgba(166, 61, 27, 0.18), transparent 50%),
+    linear-gradient(145deg, #0f0d0b 0%, #1c1814 45%, #12100e 100%);
+}
+
+#app {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+#canvas-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+}
+
+canvas:active {
+  cursor: grabbing;
+}
+
+.hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.brand-block {
+  max-width: 28rem;
+  animation: rise 1s ease-out both;
+}
+
+.brand {
+  font-family: "Syne", "Arial Narrow", sans-serif;
+  font-size: clamp(2.8rem, 8vw, 5.2rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+  color: var(--mist);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+}
+
+.brand span {
+  display: block;
+  color: var(--brass);
+}
+
+.tagline {
+  margin-top: 0.85rem;
+  max-width: 22rem;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
+  line-height: 1.45;
+  color: var(--fog);
+  opacity: 0.9;
+  animation: rise 1s ease-out 0.15s both;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.35rem;
+  pointer-events: auto;
+  animation: rise 1s ease-out 0.28s both;
+}
+
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  padding: 0.7rem 1.15rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--mist);
+}
+
+.btn-primary:hover {
+  background: #bf4a24;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--fog);
+  border-color: rgba(216, 208, 196, 0.35);
+}
+
+.btn-ghost:hover {
+  border-color: var(--brass);
+  color: var(--mist);
+}
+
+.hint {
+  justify-self: start;
+  align-self: end;
+  padding: 0.55rem 0.85rem;
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(196, 163, 90, 0.2);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--fog);
+  animation: rise 1s ease-out 0.4s both;
+}
+
+.parts {
+  position: absolute;
+  right: clamp(1.25rem, 3vw, 2.5rem);
+  bottom: clamp(1.25rem, 3vw, 2.5rem);
+  z-index: 3;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  animation: rise 1s ease-out 0.5s both;
+}
+
+.part-chip {
+  appearance: none;
+  border: 1px solid rgba(216, 208, 196, 0.2);
+  background: var(--panel);
+  backdrop-filter: blur(8px);
+  color: var(--fog);
+  text-align: left;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.part-chip:hover,
+.part-chip.active {
+  border-color: var(--brass);
+  color: var(--mist);
+  background: rgba(196, 163, 90, 0.12);
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 720px) {
+  .parts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: calc(100% - 2rem);
+    right: 1rem;
+    bottom: 4.5rem;
+  }
+
+  .hint {
+    max-width: 70%;
+  }
+}
