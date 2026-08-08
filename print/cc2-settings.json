@@ -1,0 +1,34 @@
+{
+  "printer": "Elegoo Centauri Carbon 2",
+  "build_volume_mm": [256, 256, 256],
+  "nozzle_mm": 0.4,
+  "recommended_profile": "0.20mm Standard @CC2",
+  "petg_structural": {
+    "layer_height_mm": 0.2,
+    "initial_layer_height_mm": 0.28,
+    "wall_loops": 4,
+    "wall_loops_cradles": 5,
+    "top_shells": 5,
+    "bottom_shells": 5,
+    "infill_percent": 40,
+    "infill_panel_percent": 25,
+    "infill_pattern": "gyroid",
+    "nozzle_temp_c": [240, 250],
+    "bed_temp_c": [80, 90],
+    "fan_percent": [30, 50],
+    "outer_wall_speed_mms": 100,
+    "max_speed_mms": 200,
+    "brim_mm": 8,
+    "supports": false,
+    "notes": "Do not use 500 mm/s for load-bearing parts. Prefer PETG or PETG-CF."
+  },
+  "tpu_pads": {
+    "layer_height_mm": 0.2,
+    "wall_loops": 3,
+    "infill_percent": 15,
+    "speed_mms": 35,
+    "supports": false
+  },
+  "slicer": "ELEGOO Slicer / Orca Slicer — select Centauri Carbon 2 machine profile",
+  "file": "print/RAF-silah-organizoru-CC2.3mf"
+}
