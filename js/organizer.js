@@ -387,8 +387,30 @@ function bindDragAndDrop() {
     e.preventDefault();
     dragDepth = 0;
     hideOverlay();
-    const file = e.dataTransfer?.files && e.dataTransfer.files[0];
-    if (file) loadSTLFile(file);
+
+    const dt = e.dataTransfer;
+    if (!dt) return;
+
+    let file = dt.files && dt.files[0];
+
+    // Some platforms expose dropped files via items instead of files.
+    if (!file && dt.items) {
+      for (const item of dt.items) {
+        if (item.kind === "file") {
+          file = item.getAsFile();
+          if (file) break;
+        }
+      }
+    }
+
+    if (file) {
+      loadSTLFile(file);
+    } else {
+      setUploadStatus(
+        "Sürüklenen öğe dosya olarak alınamadı. Lütfen \"STL Yükle\" butonuyla seçin.",
+        "is-error"
+      );
+    }
   });
 }
 
