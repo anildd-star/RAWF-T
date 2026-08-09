@@ -355,6 +355,41 @@ function bindUI() {
   });
 
   clearBtn?.addEventListener("click", clearUploadedModel);
+
+  bindDragAndDrop();
+}
+
+function bindDragAndDrop() {
+  const overlay = document.getElementById("drop-overlay");
+  let dragDepth = 0;
+
+  const showOverlay = () => overlay?.classList.add("is-active");
+  const hideOverlay = () => overlay?.classList.remove("is-active");
+
+  window.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    dragDepth += 1;
+    showOverlay();
+  });
+
+  window.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+  });
+
+  window.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) hideOverlay();
+  });
+
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dragDepth = 0;
+    hideOverlay();
+    const file = e.dataTransfer?.files && e.dataTransfer.files[0];
+    if (file) loadSTLFile(file);
+  });
 }
 
 function setUploadStatus(message, kind = "") {

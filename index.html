@@ -29,6 +29,10 @@
       <div class="vignette" aria-hidden="true"></div>
       <div id="canvas-wrap"></div>
 
+      <div class="drop-overlay" id="drop-overlay" aria-hidden="true">
+        <div class="drop-overlay__inner">STL dosyasını bırak</div>
+      </div>
+
       <div class="hud">
         <header class="brand-block">
           <h1 class="brand">RAF<span>Silah Organizörü</span></h1>
@@ -52,14 +56,14 @@
             <input
               type="file"
               id="stl-input"
-              accept=".stl,model/stl,application/vnd.ms-pki.stl,application/sla"
+              accept=".stl,.STL,model/stl,application/vnd.ms-pki.stl,application/sla,application/octet-stream"
               hidden
             />
           </div>
           <p class="upload-status" id="upload-status" role="status" aria-live="polite"></p>
         </header>
 
-        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla · STL yükle</p>
+        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla · STL yükle veya sürükle-bırak</p>
       </div>
 
       <nav class="parts" aria-label="Parça odakları">
