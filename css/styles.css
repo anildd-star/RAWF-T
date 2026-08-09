@@ -149,6 +149,26 @@ canvas:active {
   color: var(--mist);
 }
 
+.upload-status {
+  margin-top: 0.7rem;
+  max-width: 24rem;
+  min-height: 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  color: var(--fog);
+  pointer-events: none;
+  animation: rise 1s ease-out 0.28s both;
+}
+
+.upload-status.is-error {
+  color: #e88a6a;
+}
+
+.upload-status.is-ok {
+  color: var(--brass);
+}
+
 .hint {
   justify-self: start;
   align-self: end;

@@ -43,10 +43,23 @@
             <button type="button" class="btn btn-ghost" id="btn-reset">
               Sıfırla
             </button>
+            <button type="button" class="btn btn-ghost" id="btn-upload">
+              STL Yükle
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-clear-stl" hidden>
+              Modeli Kaldır
+            </button>
+            <input
+              type="file"
+              id="stl-input"
+              accept=".stl,model/stl,application/vnd.ms-pki.stl,application/sla"
+              hidden
+            />
           </div>
+          <p class="upload-status" id="upload-status" role="status" aria-live="polite"></p>
         </header>
 
-        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla</p>
+        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla · STL yükle</p>
       </div>
 
       <nav class="parts" aria-label="Parça odakları">

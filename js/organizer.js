@@ -6,6 +6,7 @@
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
 
 const OAK = 0x8b5a2b;
 const OAK_DARK = 0x5c3a1a;
@@ -20,6 +21,9 @@ let clock = new THREE.Clock();
 let highlightTarget = null;
 let highlightPulse = 0;
 const partMeshes = {};
+
+const stlLoader = new STLLoader();
+let uploadedModel = null;
 
 init();
 animate();
@@ -336,6 +340,128 @@ function bindUI() {
       focusPart(key);
     });
   });
+
+  const uploadBtn = document.getElementById("btn-upload");
+  const fileInput = document.getElementById("stl-input");
+  const clearBtn = document.getElementById("btn-clear-stl");
+
+  uploadBtn?.addEventListener("click", () => fileInput?.click());
+
+  fileInput?.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) loadSTLFile(file);
+    // Reset so selecting the same file again re-triggers change.
+    e.target.value = "";
+  });
+
+  clearBtn?.addEventListener("click", clearUploadedModel);
+}
+
+function setUploadStatus(message, kind = "") {
+  const el = document.getElementById("upload-status");
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove("is-error", "is-ok");
+  if (kind) el.classList.add(kind);
+}
+
+function loadSTLFile(file) {
+  const name = file.name || "model.stl";
+  if (!/\.stl$/i.test(name)) {
+    setUploadStatus(`"${name}" bir STL dosyası değil.`, "is-error");
+    return;
+  }
+
+  setUploadStatus(`"${name}" yükleniyor…`);
+
+  const reader = new FileReader();
+  reader.onerror = () => setUploadStatus(`"${name}" okunamadı.`, "is-error");
+  reader.onload = (ev) => {
+    try {
+      const geometry = stlLoader.parse(ev.target.result);
+      addUploadedGeometry(geometry, name);
+    } catch (err) {
+      console.error("STL parse error:", err);
+      setUploadStatus(`"${name}" ayrıştırılamadı. Geçerli bir STL dosyası olduğundan emin olun.`, "is-error");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function addUploadedGeometry(geometry, name) {
+  clearUploadedModel();
+
+  geometry.computeBoundingBox();
+  geometry.computeVertexNormals();
+
+  // Center the geometry on its own origin.
+  const bbox = geometry.boundingBox;
+  const size = bbox.getSize(new THREE.Vector3());
+  const center = bbox.getCenter(new THREE.Vector3());
+  geometry.translate(-center.x, -center.y, -center.z);
+
+  // Normalize scale so the largest dimension is a comfortable size in-scene.
+  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+  const targetSize = 1.4;
+  const scale = targetSize / maxDim;
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xc4a35a,
+    roughness: 0.4,
+    metalness: 0.6,
+    flatShading: false,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.scale.setScalar(scale);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+
+  // Place the model in front of the organizer, around the focus height.
+  mesh.position.set(0, 0.95, 0.9);
+
+  uploadedModel = mesh;
+  partMeshes.uploaded = mesh;
+  scene.add(mesh);
+
+  const dims = `${size.x.toFixed(1)} × ${size.y.toFixed(1)} × ${size.z.toFixed(1)}`;
+  setUploadStatus(`"${name}" yüklendi (${dims} birim).`, "is-ok");
+
+  const clearBtn = document.getElementById("btn-clear-stl");
+  if (clearBtn) clearBtn.hidden = false;
+
+  frameObject(mesh);
+}
+
+function clearUploadedModel() {
+  if (!uploadedModel) return;
+  scene.remove(uploadedModel);
+  uploadedModel.geometry?.dispose();
+  uploadedModel.material?.dispose();
+  if (highlightTarget === uploadedModel) highlightTarget = null;
+  uploadedModel = null;
+  delete partMeshes.uploaded;
+
+  const clearBtn = document.getElementById("btn-clear-stl");
+  if (clearBtn) clearBtn.hidden = true;
+  setUploadStatus("Yüklenen model kaldırıldı.");
+}
+
+function frameObject(object) {
+  const box3 = new THREE.Box3().setFromObject(object);
+  const center = box3.getCenter(new THREE.Vector3());
+  const size = box3.getSize(new THREE.Vector3());
+  const dist = Math.max(size.x, size.y, size.z) * 2.4 + 1.4;
+
+  highlightTarget = object;
+  highlightPulse = 0;
+
+  const endPos = new THREE.Vector3(
+    center.x + dist * 0.55,
+    center.y + dist * 0.28,
+    center.z + dist * 0.75
+  );
+  animateCamera(endPos, center);
 }
 
 function focusPart(key) {
