@@ -1,0 +1,16 @@
+{
+  "name": "RAF — Silah Organizörü (3D)",
+  "ports": [
+    {
+      "name": "web",
+      "port": 3000
+    }
+  ],
+  "terminals": [
+    {
+      "name": "web",
+      "command": "python3 -m http.server 3000",
+      "description": "Static HTTP server for the Three.js app. Open http://localhost:3000 in a browser."
+    }
+  ]
+}
