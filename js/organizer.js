@@ -417,8 +417,8 @@ function addUploadedGeometry(geometry, name) {
   mesh.castShadow = true;
   mesh.receiveShadow = true;
 
-  // Place the model in front of the organizer, around the focus height.
-  mesh.position.set(0, 0.95, 0.9);
+  // Float the model clearly in front of the organizer so it does not overlap it.
+  mesh.position.set(0, 0.9, 1.9);
 
   uploadedModel = mesh;
   partMeshes.uploaded = mesh;
