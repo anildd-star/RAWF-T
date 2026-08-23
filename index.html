@@ -30,7 +30,7 @@
       <div id="canvas-wrap"></div>
 
       <div class="drop-overlay" id="drop-overlay" aria-hidden="true">
-        <div class="drop-overlay__inner">STL dosyasını bırak</div>
+        <div class="drop-overlay__inner">STL / 3MF dosyasını bırak</div>
       </div>
 
       <div class="hud">
@@ -48,7 +48,7 @@
               Sıfırla
             </button>
             <button type="button" class="btn btn-ghost" id="btn-upload">
-              STL Yükle
+              Model Yükle
             </button>
             <button type="button" class="btn btn-ghost" id="btn-clear-stl" hidden>
               Modeli Kaldır
@@ -56,14 +56,14 @@
             <input
               type="file"
               id="stl-input"
-              accept=".stl,.STL,model/stl,application/vnd.ms-pki.stl,application/sla,application/octet-stream"
+              accept=".stl,.STL,.3mf,.3MF,model/stl,application/vnd.ms-pki.stl,application/sla,model/3mf,application/vnd.ms-package.3dmanufacturing-3dmodel+xml,application/octet-stream"
               hidden
             />
           </div>
           <p class="upload-status" id="upload-status" role="status" aria-live="polite"></p>
         </header>
 
-        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla · STL yükle veya sürükle-bırak</p>
+        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla · STL/3MF yükle veya sürükle-bırak</p>
       </div>
 
       <nav class="parts" aria-label="Parça odakları">

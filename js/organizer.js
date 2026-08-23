@@ -7,6 +7,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
+import { ThreeMFLoader } from "three/addons/loaders/3MFLoader.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 const OAK = 0x8b5a2b;
 const OAK_DARK = 0x5c3a1a;
@@ -23,6 +25,7 @@ let highlightPulse = 0;
 const partMeshes = {};
 
 const stlLoader = new STLLoader();
+const threeMFLoader = new ThreeMFLoader();
 let uploadedModel = null;
 
 init();
@@ -349,7 +352,7 @@ function bindUI() {
 
   fileInput?.addEventListener("change", (e) => {
     const file = e.target.files && e.target.files[0];
-    if (file) loadSTLFile(file);
+    if (file) loadModelFile(file);
     // Reset so selecting the same file again re-triggers change.
     e.target.value = "";
   });
@@ -404,10 +407,10 @@ function bindDragAndDrop() {
     }
 
     if (file) {
-      loadSTLFile(file);
+      loadModelFile(file);
     } else {
       setUploadStatus(
-        "Sürüklenen öğe dosya olarak alınamadı. Lütfen \"STL Yükle\" butonuyla seçin.",
+        "Sürüklenen öğe dosya olarak alınamadı. Lütfen \"Model Yükle\" butonuyla seçin.",
         "is-error"
       );
     }
@@ -422,10 +425,12 @@ function setUploadStatus(message, kind = "") {
   if (kind) el.classList.add(kind);
 }
 
-function loadSTLFile(file) {
-  const name = file.name || "model.stl";
-  if (!/\.stl$/i.test(name)) {
-    setUploadStatus(`"${name}" bir STL dosyası değil.`, "is-error");
+function loadModelFile(file) {
+  const name = file.name || "model";
+  const isSTL = /\.stl$/i.test(name);
+  const is3MF = /\.3mf$/i.test(name);
+  if (!isSTL && !is3MF) {
+    setUploadStatus(`"${name}" desteklenmeyen dosya. Lütfen STL veya 3MF yükleyin.`, "is-error");
     return;
   }
 
@@ -435,14 +440,41 @@ function loadSTLFile(file) {
   reader.onerror = () => setUploadStatus(`"${name}" okunamadı.`, "is-error");
   reader.onload = (ev) => {
     try {
-      const geometry = stlLoader.parse(ev.target.result);
+      let geometry;
+      if (isSTL) {
+        geometry = stlLoader.parse(ev.target.result);
+      } else {
+        const obj = threeMFLoader.parse(ev.target.result);
+        geometry = geometryFromObject(obj);
+        if (!geometry) throw new Error("3MF içinde geometri bulunamadı");
+      }
       addUploadedGeometry(geometry, name);
     } catch (err) {
-      console.error("STL parse error:", err);
-      setUploadStatus(`"${name}" ayrıştırılamadı. Geçerli bir STL dosyası olduğundan emin olun.`, "is-error");
+      console.error("model parse error:", err);
+      setUploadStatus(`"${name}" ayrıştırılamadı. Geçerli bir STL/3MF dosyası olduğundan emin olun.`, "is-error");
     }
   };
   reader.readAsArrayBuffer(file);
+}
+
+// Flatten an Object3D (e.g. a parsed 3MF group) into a single position-only
+// BufferGeometry in world space, so it can be handled like an STL geometry.
+function geometryFromObject(obj) {
+  obj.updateMatrixWorld(true);
+  const geoms = [];
+  obj.traverse((c) => {
+    if (c.isMesh && c.geometry) {
+      const src = c.geometry.index ? c.geometry.toNonIndexed() : c.geometry.clone();
+      src.applyMatrix4(c.matrixWorld);
+      const pos = src.getAttribute("position");
+      if (!pos) return;
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", pos.clone());
+      geoms.push(g);
+    }
+  });
+  if (geoms.length === 0) return null;
+  return geoms.length === 1 ? geoms[0] : mergeGeometries(geoms, false);
 }
 
 function addUploadedGeometry(geometry, name) {
