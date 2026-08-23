@@ -6,6 +6,9 @@
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { STLLoader } from "three/addons/loaders/STLLoader.js";
+import { ThreeMFLoader } from "three/addons/loaders/3MFLoader.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 
 const OAK = 0x8b5a2b;
 const OAK_DARK = 0x5c3a1a;
@@ -20,6 +23,10 @@ let clock = new THREE.Clock();
 let highlightTarget = null;
 let highlightPulse = 0;
 const partMeshes = {};
+
+const stlLoader = new STLLoader();
+const threeMFLoader = new ThreeMFLoader();
+let uploadedModel = null;
 
 init();
 animate();
@@ -336,6 +343,214 @@ function bindUI() {
       focusPart(key);
     });
   });
+
+  const uploadBtn = document.getElementById("btn-upload");
+  const fileInput = document.getElementById("stl-input");
+  const clearBtn = document.getElementById("btn-clear-stl");
+
+  uploadBtn?.addEventListener("click", () => fileInput?.click());
+
+  fileInput?.addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) loadModelFile(file);
+    // Reset so selecting the same file again re-triggers change.
+    e.target.value = "";
+  });
+
+  clearBtn?.addEventListener("click", clearUploadedModel);
+
+  bindDragAndDrop();
+}
+
+function bindDragAndDrop() {
+  const overlay = document.getElementById("drop-overlay");
+  let dragDepth = 0;
+
+  const showOverlay = () => overlay?.classList.add("is-active");
+  const hideOverlay = () => overlay?.classList.remove("is-active");
+
+  window.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    dragDepth += 1;
+    showOverlay();
+  });
+
+  window.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+  });
+
+  window.addEventListener("dragleave", (e) => {
+    e.preventDefault();
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) hideOverlay();
+  });
+
+  window.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dragDepth = 0;
+    hideOverlay();
+
+    const dt = e.dataTransfer;
+    if (!dt) return;
+
+    let file = dt.files && dt.files[0];
+
+    // Some platforms expose dropped files via items instead of files.
+    if (!file && dt.items) {
+      for (const item of dt.items) {
+        if (item.kind === "file") {
+          file = item.getAsFile();
+          if (file) break;
+        }
+      }
+    }
+
+    if (file) {
+      loadModelFile(file);
+    } else {
+      setUploadStatus(
+        "Sürüklenen öğe dosya olarak alınamadı. Lütfen \"Model Yükle\" butonuyla seçin.",
+        "is-error"
+      );
+    }
+  });
+}
+
+function setUploadStatus(message, kind = "") {
+  const el = document.getElementById("upload-status");
+  if (!el) return;
+  el.textContent = message;
+  el.classList.remove("is-error", "is-ok");
+  if (kind) el.classList.add(kind);
+}
+
+function loadModelFile(file) {
+  const name = file.name || "model";
+  const isSTL = /\.stl$/i.test(name);
+  const is3MF = /\.3mf$/i.test(name);
+  if (!isSTL && !is3MF) {
+    setUploadStatus(`"${name}" desteklenmeyen dosya. Lütfen STL veya 3MF yükleyin.`, "is-error");
+    return;
+  }
+
+  setUploadStatus(`"${name}" yükleniyor…`);
+
+  const reader = new FileReader();
+  reader.onerror = () => setUploadStatus(`"${name}" okunamadı.`, "is-error");
+  reader.onload = (ev) => {
+    try {
+      let geometry;
+      if (isSTL) {
+        geometry = stlLoader.parse(ev.target.result);
+      } else {
+        const obj = threeMFLoader.parse(ev.target.result);
+        geometry = geometryFromObject(obj);
+        if (!geometry) throw new Error("3MF içinde geometri bulunamadı");
+      }
+      addUploadedGeometry(geometry, name);
+    } catch (err) {
+      console.error("model parse error:", err);
+      setUploadStatus(`"${name}" ayrıştırılamadı. Geçerli bir STL/3MF dosyası olduğundan emin olun.`, "is-error");
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// Flatten an Object3D (e.g. a parsed 3MF group) into a single position-only
+// BufferGeometry in world space, so it can be handled like an STL geometry.
+function geometryFromObject(obj) {
+  obj.updateMatrixWorld(true);
+  const geoms = [];
+  obj.traverse((c) => {
+    if (c.isMesh && c.geometry) {
+      const src = c.geometry.index ? c.geometry.toNonIndexed() : c.geometry.clone();
+      src.applyMatrix4(c.matrixWorld);
+      const pos = src.getAttribute("position");
+      if (!pos) return;
+      const g = new THREE.BufferGeometry();
+      g.setAttribute("position", pos.clone());
+      geoms.push(g);
+    }
+  });
+  if (geoms.length === 0) return null;
+  return geoms.length === 1 ? geoms[0] : mergeGeometries(geoms, false);
+}
+
+function addUploadedGeometry(geometry, name) {
+  clearUploadedModel();
+
+  geometry.computeBoundingBox();
+  geometry.computeVertexNormals();
+
+  // Center the geometry on its own origin.
+  const bbox = geometry.boundingBox;
+  const size = bbox.getSize(new THREE.Vector3());
+  const center = bbox.getCenter(new THREE.Vector3());
+  geometry.translate(-center.x, -center.y, -center.z);
+
+  // Normalize scale so the largest dimension is a comfortable size in-scene.
+  const maxDim = Math.max(size.x, size.y, size.z) || 1;
+  const targetSize = 1.4;
+  const scale = targetSize / maxDim;
+
+  const material = new THREE.MeshStandardMaterial({
+    color: 0xc4a35a,
+    roughness: 0.4,
+    metalness: 0.6,
+    flatShading: false,
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.scale.setScalar(scale);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+
+  // Float the model clearly in front of the organizer so it does not overlap it.
+  mesh.position.set(0, 0.9, 1.9);
+
+  uploadedModel = mesh;
+  partMeshes.uploaded = mesh;
+  scene.add(mesh);
+
+  const dims = `${size.x.toFixed(1)} × ${size.y.toFixed(1)} × ${size.z.toFixed(1)}`;
+  setUploadStatus(`"${name}" yüklendi (${dims} birim).`, "is-ok");
+
+  const clearBtn = document.getElementById("btn-clear-stl");
+  if (clearBtn) clearBtn.hidden = false;
+
+  frameObject(mesh);
+}
+
+function clearUploadedModel() {
+  if (!uploadedModel) return;
+  scene.remove(uploadedModel);
+  uploadedModel.geometry?.dispose();
+  uploadedModel.material?.dispose();
+  if (highlightTarget === uploadedModel) highlightTarget = null;
+  uploadedModel = null;
+  delete partMeshes.uploaded;
+
+  const clearBtn = document.getElementById("btn-clear-stl");
+  if (clearBtn) clearBtn.hidden = true;
+  setUploadStatus("Yüklenen model kaldırıldı.");
+}
+
+function frameObject(object) {
+  const box3 = new THREE.Box3().setFromObject(object);
+  const center = box3.getCenter(new THREE.Vector3());
+  const size = box3.getSize(new THREE.Vector3());
+  const dist = Math.max(size.x, size.y, size.z) * 2.4 + 1.4;
+
+  highlightTarget = object;
+  highlightPulse = 0;
+
+  const endPos = new THREE.Vector3(
+    center.x + dist * 0.55,
+    center.y + dist * 0.28,
+    center.z + dist * 0.75
+  );
+  animateCamera(endPos, center);
 }
 
 function focusPart(key) {

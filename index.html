@@ -29,6 +29,10 @@
       <div class="vignette" aria-hidden="true"></div>
       <div id="canvas-wrap"></div>
 
+      <div class="drop-overlay" id="drop-overlay" aria-hidden="true">
+        <div class="drop-overlay__inner">STL / 3MF dosyasını bırak</div>
+      </div>
+
       <div class="hud">
         <header class="brand-block">
           <h1 class="brand">RAF<span>Silah Organizörü</span></h1>
@@ -43,10 +47,23 @@
             <button type="button" class="btn btn-ghost" id="btn-reset">
               Sıfırla
             </button>
+            <button type="button" class="btn btn-ghost" id="btn-upload">
+              Model Yükle
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-clear-stl" hidden>
+              Modeli Kaldır
+            </button>
+            <input
+              type="file"
+              id="stl-input"
+              accept=".stl,.STL,.3mf,.3MF,model/stl,application/vnd.ms-pki.stl,application/sla,model/3mf,application/vnd.ms-package.3dmanufacturing-3dmodel+xml,application/octet-stream"
+              hidden
+            />
           </div>
+          <p class="upload-status" id="upload-status" role="status" aria-live="polite"></p>
         </header>
 
-        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla</p>
+        <p class="hint">Sürükle · Yakınlaştır · Parçalara tıkla · STL/3MF yükle veya sürükle-bırak</p>
       </div>
 
       <nav class="parts" aria-label="Parça odakları">

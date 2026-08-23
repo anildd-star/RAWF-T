@@ -149,6 +149,26 @@ canvas:active {
   color: var(--mist);
 }
 
+.upload-status {
+  margin-top: 0.7rem;
+  max-width: 24rem;
+  min-height: 1rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  color: var(--fog);
+  pointer-events: none;
+  animation: rise 1s ease-out 0.28s both;
+}
+
+.upload-status.is-error {
+  color: #e88a6a;
+}
+
+.upload-status.is-ok {
+  color: var(--brass);
+}
+
 .hint {
   justify-self: start;
   align-self: end;
@@ -203,6 +223,36 @@ canvas:active {
   z-index: 1;
   background:
     radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, 0.45) 100%);
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(18, 15, 12, 0.72);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+.drop-overlay.is-active {
+  display: flex;
+}
+
+.drop-overlay__inner {
+  padding: 2rem 3rem;
+  border: 2px dashed var(--brass);
+  border-radius: 4px;
+  font-family: "Syne", "Arial Narrow", sans-serif;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--mist);
+  text-transform: uppercase;
+  background: rgba(196, 163, 90, 0.08);
 }
 
 @keyframes rise {
